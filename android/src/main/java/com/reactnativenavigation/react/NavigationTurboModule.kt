@@ -86,7 +86,7 @@ class NavigationTurboModule(
             val viewController = layoutFactory.create(layoutTree)
             val activity = currentActivity
             if (activity == null) {
-                eventEmitter.emitCommandCompletion(commandId, "Activity is null")
+                promise.reject("ACTIVITY_NULL", "Activity is null")
                 return@handle
             }
             navigator()?.setRoot(
