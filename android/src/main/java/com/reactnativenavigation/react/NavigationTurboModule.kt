@@ -32,6 +32,14 @@ class NavigationTurboModule(
     private lateinit var eventEmitter: EventEmitter
 
     init {
+        activity()?.let { act ->
+            act.navigator?.let { nav ->
+                eventEmitter = EventEmitter(reactContext)
+                layoutFactory.init(act, eventEmitter, nav.childRegistry,
+                    (reactApplicationContext.applicationContext as NavigationApplication).externalComponents)
+            }
+        }
+
         reactContext.addLifecycleEventListener(object : LifecycleEventListenerAdapter() {
             override fun onHostPause() {
                 super.onHostPause()
@@ -83,12 +91,12 @@ class NavigationTurboModule(
         )
         handle {
             Log.d("NavigationTurboModule", "setRoot handle ${Thread.currentThread()}")
-            val viewController = layoutFactory.create(layoutTree)
             val activity = currentActivity
             if (activity == null) {
                 promise.reject("ACTIVITY_NULL", "Activity is null")
                 return@handle
             }
+            val viewController = layoutFactory.create(layoutTree)
             navigator()?.setRoot(
                 viewController,
                 NativeCommandListener("setRoot", commandId, promise, eventEmitter, now)
